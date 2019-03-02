@@ -3,7 +3,8 @@ include('lib/Helpers');
 include('lib/CacheCache');		// cc
 
 if (getTurn() == 1) {
-	setWeapon(WEAPON_MAGNUM);
+    setWeaponAndUpdate(WEAPON_PISTOL);
+    setWeaponAndUpdate(WEAPON_MAGNUM);
 }
 
 if (MAX_LIFE - getLife() > 100) {

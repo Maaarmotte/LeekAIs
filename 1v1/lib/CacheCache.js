@@ -9,7 +9,7 @@ function ccGetMask(distance) {
     var mask = CC_MASK[distance];
     
     if (mask == null) {
-		debug('Generating mask for d=' + distance);
+        debug('Generating mask for d=' + distance);
 	
         mask = [];
 
