@@ -40,13 +40,11 @@ function cdGetCellDistance(cell1, cell2) {
 }
 
 function cdLineOfSight(cell1, cell2, leek) {
-	var key = leek;
-	
 	if (leek == null) {
 		leek = LEEK;	// Not sure it's a good idea...
 	}
 	
-	return cdCompute(cell1, cell2, @CD_LINE_OF_SIGHT[key], function (start, end) {
+	return cdCompute(cell1, cell2, @CD_LINE_OF_SIGHT[leek], function (start, end) {
 		return lineOfSight(start, end, leek);
 	});
 }
