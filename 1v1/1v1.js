@@ -18,38 +18,39 @@ if (willBeInRangeFromSpark()) {
 
 var around = ccGetCellsAround(CURRENT_CELL, CURRENT_MP);
 var reachable = ccFilterReachable(around, CURRENT_CELL, LEEK);
-var target = ccFilterCanShootCell(reachable, ENEMY_CELL);
+var target;
 
-if (isEmpty(target)) {
-	debug('No cell to shoot from!');
+// Loop on all equipped weapons and chips
+for (var weaponOrChip in getUsableWeaponsAndChips()) {
+    target = ccFilterCanShootCell(reachable, ENEMY_CELL, weaponOrChip);
 
-	moveTowardCellAndUpdate(
-		ccGetClosestCellFromCell(reachable, ENEMY_CELL)
-	);
+    // Try to move and shoot this weapon
+    if (!isEmpty(target)) {
+        if ((isWeapon(weaponOrChip) && getTP() >= getWeaponCost(weaponOrChip)) || (isChip(weaponOrChip) && getTP() >= getChipCost(weaponOrChip))) {
+            moveTowardCellAndUpdate(
+                ccGetClosestCellFromCell(target, CURRENT_CELL)
+            );
+
+            spamWeaponOrChip(weaponOrChip);
+        }
+    }
+}
+
+// Let's find a reachable safe cell
+around = ccGetCellsAround(CURRENT_CELL, CURRENT_MP);
+reachable = ccFilterReachable(around, CURRENT_CELL, LEEK);
+target = ccFilterIsSafeFromLeek(reachable, ENEMY);
+
+if (!isEmpty(target)) {
+    moveTowardCellAndUpdate(
+        ccGetClosestCellFromCell(target, ENEMY_CELL)
+    );
 } else {
-	if (getTP() >= CURRENT_WEAPON_COST) {
-		moveTowardCellAndUpdate(
-			ccGetClosestCellFromCell(target, CURRENT_CELL)
-		);
-		
-		spamWeapon();
-	}
-	
-	around = ccGetCellsAround(CURRENT_CELL, CURRENT_MP);
-	reachable = ccFilterReachable(around, CURRENT_CELL, LEEK);
-	target = ccFilterIsSafeFromLeek(reachable, ENEMY);
-	
-	if (isEmpty(target)) {
-		debug('No safe cell!');
-		
-		moveTowardCellAndUpdate(
-			ccGetFarthestCellFromCell(reachable, ENEMY_CELL)
-		);
-	} else {
-		moveTowardCellAndUpdate(
-			ccGetFarthestCellFromCell(target, ENEMY_CELL)
-		);
-	}
+    debug('No safe cell!');
+    
+    moveTowardCellAndUpdate(
+        ccGetFarthestCellFromCell(reachable, ENEMY_CELL)
+    );
 }
 
 spamSpark();

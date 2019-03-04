@@ -1,5 +1,5 @@
 include('Values');
-include('CachedDistances');
+include('CachedDistances');		// cd
 
 function moveTowardCellAndUpdate(cell) {
 	CURRENT_MP = CURRENT_MP - moveTowardCell(cell);
@@ -20,13 +20,28 @@ function setWeaponAndUpdate(weapon) {
     GUN_MAX_RANGE = getWeaponMaxRange(CURRENT_WEAPON);
 }
 
-function spamWeapon() {
-	var distance = cdGetCellDistance(CURRENT_CELL, ENEMY_CELL);
-	if (distance <= GUN_MAX_RANGE && cdLineOfSight(CURRENT_CELL, ENEMY_CELL, LEEK)) {
-		while (getTP() >= getWeaponCost(getWeapon()) && isAlive(ENEMY)) {
-			useWeapon(ENEMY);
-		}
-	}
+function spamWeaponOrChip(weaponOrChip) {
+    var distance = cdGetCellDistance(CURRENT_CELL, ENEMY_CELL);
+    
+    if (isWeapon(weaponOrChip)) {
+        var minRange = getWeaponMinRange(weaponOrChip);
+        var maxRange = getWeaponMaxRange(weaponOrChip);
+
+        if (distance >= minRange && distance <= maxRange && cdLineOfSight(CURRENT_CELL, ENEMY_CELL, LEEK)) {
+            while (getTP() >= getWeaponCost(getWeapon()) && isAlive(ENEMY)) {
+                useWeapon(ENEMY);
+            }
+        }
+    } else if (isChip(weaponOrChip)) {
+        var minRange = getChipMinRange(weaponOrChip);
+        var maxRange = getChipMaxRange(weaponOrChip);
+
+        if (distance >= minRange && distance <= maxRange && cdLineOfSight(CURRENT_CELL, ENEMY_CELL, LEEK)) {
+            while (getTP() >= getChipCost(weaponOrChip) && getCooldown(weaponOrChip) == 0 && canUseChip(weaponOrChip, ENEMY) && isAlive(ENEMY)) {
+                useChip(weaponOrChip, ENEMY);
+            }
+        }
+    }
 }
 
 function spamSpark() {
@@ -40,4 +55,16 @@ function spamSpark() {
 
 function willBeInRangeFromSpark() {
 	return cdGetCellDistance(CURRENT_CELL, ENEMY_CELL) - CURRENT_MP <= SPARK_RANGE + ENEMY_MP;
+}
+
+function getUsableWeaponsAndChips() {
+    var weaponsAndChips = [];
+
+    if (search(getChips(), CHIP_STALACTITE) != null) {
+        push(weaponsAndChips, CHIP_STALACTITE);
+    }
+
+    push(weaponsAndChips, getWeapon());
+
+    return weaponsAndChips;
 }

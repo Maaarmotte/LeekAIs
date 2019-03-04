@@ -54,12 +54,23 @@ function ccFilterReachable(cells, origin, leek) {
 	});
 }
 
-function ccFilterCanShootCell(cells, cell) {
+function ccFilterCanShootCell(cells, cell, weaponOrChip) {
+    var minRange = 0;
+    var maxRange = 0;
+
+    if (isWeapon(weaponOrChip)) {
+        minRange = getWeaponMinRange(weaponOrChip);
+        maxRange = getWeaponMaxRange(weaponOrChip);
+    } else if (isChip(weaponOrChip)) {
+        minRange = getChipMinRange(weaponOrChip);
+        maxRange = getChipMaxRange(weaponOrChip);
+    }
+
 	return arrayFilter(cells, function(c) {
 		var cellDistance = cdGetCellDistance(c, cell);
 	
-		return cellDistance <= GUN_MAX_RANGE &&
-			cellDistance >= GUN_MIN_RANGE &&
+		return cellDistance <= maxRange &&
+			cellDistance >= minRange &&
 			!isObstacle(c) &&
 			cdLineOfSight(c, cell, LEEK);
 	});
