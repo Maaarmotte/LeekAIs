@@ -19,6 +19,7 @@ if (willBeInRangeFromSpark()) {
 var around = ccGetCellsAround(CURRENT_CELL, CURRENT_MP);
 var reachable = ccFilterReachable(around, CURRENT_CELL, LEEK);
 var target;
+var shot = false;
 
 // Loop on all equipped weapons and chips
 for (var weaponOrChip in getUsableWeaponsAndChips()) {
@@ -32,6 +33,8 @@ for (var weaponOrChip in getUsableWeaponsAndChips()) {
             );
 
             spamWeaponOrChip(weaponOrChip);
+
+            shot = true;
         }
     }
 }
@@ -42,12 +45,18 @@ reachable = ccFilterReachable(around, CURRENT_CELL, LEEK);
 target = ccFilterIsSafeFromLeek(reachable, ENEMY);
 
 if (!isEmpty(target)) {
-    moveTowardCellAndUpdate(
-        ccGetClosestCellFromCell(target, ENEMY_CELL)
-    );
+    if (shot) {
+        moveTowardCellAndUpdate(
+            ccGetClosestCellFromCell(target, ENEMY_CELL)
+        );
+    } else {    // Don't play the draw, it's lame
+        moveTowardCellAndUpdate(
+            ccGetClosestCellFromCell(reachable, ENEMY_CELL)
+        );
+    }
 } else {
     debug('No safe cell!');
-    
+
     moveTowardCellAndUpdate(
         ccGetFarthestCellFromCell(reachable, ENEMY_CELL)
     );
