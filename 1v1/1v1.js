@@ -42,23 +42,24 @@ for (var weaponOrChip in getUsableWeaponsAndChips()) {
 // Let's find a reachable safe cell
 around = ccGetCellsAround(CURRENT_CELL, CURRENT_MP);
 reachable = ccFilterReachable(around, CURRENT_CELL, LEEK);
-target = ccFilterIsSafeFromLeek(reachable, ENEMY);
 
-if (!isEmpty(target)) {
-    if (shot) {
+if (shot) {
+    target = ccFilterIsSafeFromLeek(reachable, ENEMY);
+
+    if (!isEmpty(target)) {
         moveTowardCellAndUpdate(
             ccGetClosestCellFromCell(target, ENEMY_CELL)
         );
-    } else {    // Don't play the draw, it's lame
+    } else {
+        debug('No safe cell!');
+
         moveTowardCellAndUpdate(
-            ccGetClosestCellFromCell(reachable, ENEMY_CELL)
+            ccGetFarthestCellFromCell(reachable, ENEMY_CELL)
         );
     }
-} else {
-    debug('No safe cell!');
-
+} else {    // Don't play the draw, it's lame
     moveTowardCellAndUpdate(
-        ccGetFarthestCellFromCell(reachable, ENEMY_CELL)
+        ccGetClosestCellFromCell(reachable, ENEMY_CELL)
     );
 }
 
